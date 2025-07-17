@@ -1,0 +1,49 @@
+name: Build and Deploy to Staging
+
+on:
+  # Trigger on push to the staging branch of this repo
+  push:
+    branches: [ staging ]
+  # Trigger when a submodule sends a notification
+  repository_dispatch:
+    types: [ submodule-updated ]
+  # Allow manual triggering from the GitHub UI
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Main Repo and Submodules
+        uses: actions/checkout@v4
+        with:
+          # Use the PAT to access private submodules
+          token: ${{ secrets.PAT }}
+          # Recursively checkout all submodules
+          submodules: 'recursive'
+
+      - name: Deploy to Staging Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Navigate to the project directory
+            cd /opt/cut-dana-staging
+
+            # Pull the latest changes for the main repo
+            git pull
+
+            # CRITICAL: Update submodules to the latest commit on their staging branch
+            git submodule update --init --recursive --remote
+
+            # Create the .env files from GitHub Secrets
+            echo "${{ secrets.DOTENV_MP }}" > .env
+            echo "${{ secrets.DOTENV_BACKEND }}" > backend/.env
+
+            # Build and restart all services
+            docker compose up -d --build --remove-orphans
+
+            # Clean up old, unused Docker images to save space
+            docker image prune -f

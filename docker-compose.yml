@@ -5,23 +5,23 @@ services:
             dockerfile: Dockerfile
         ports:
             - '3000:80'
-        volumes:
-            - /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/fullchain2.pem:/etc/ssl/certs/mycert.pem
-            - /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/privkey2.pem:/etc/ssl/private/mykey.pem
+              #        volumes:
+              #            - /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/fullchain2.pem:/etc/ssl/certs/mycert.pem
+              #            - /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/privkey2.pem:/etc/ssl/private/mykey.pem
         networks:
             - story-network
 
     story-backend:
         build:
-            context: ./story-backend
+            context: ./backend
         ports:
             - "4000:80"
             - "4443:443"
         depends_on:
             - mongo
-        volumes:
-            - /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/fullchain2.pem:/etc/ssl/certs/mycert.pem
-            - /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/privkey2.pem:/etc/ssl/private/mykey.pem
+              #        volumes:
+              #- /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/fullchain2.pem:/etc/ssl/certs/mycert.pem
+              #- /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/privkey2.pem:/etc/ssl/private/mykey.pem
         networks:
             - story-network
 
@@ -65,37 +65,37 @@ services:
         networks:
             - story-network
 
-    keycloak:
-        image: quay.io/keycloak/keycloak:23.0.6
-        environment:
-            KC_HOSTNAME: story.datanarrator.city/keycloak/
-            KC_HEALTH_ENABLED: true
-            KC_METRICS_ENABLED: true
-            KC_PROXY_HEADERS: forwarded
-            KC_HTTP_ENABLED: true
-
-            KC_DB_URL: jdbc:postgresql://postgres/${POSTGRES_DB}
-            KC_DB: postgres
-            KC_DB_USERNAME: ${POSTGRES_USER}
-            KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
-            KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-            KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-
-            KC_HTTPS_CERTIFICATE_FILE: /etc/ssl/certs/mycert.pem
-            KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/ssl/private/mykey.pem
-        ports:
-            - 8444:8443
-            - 9000:8080
-        restart: always
-        depends_on:
-            - postgres
-        networks:
-            - story-network
-        volumes:
-            - /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/fullchain2.pem:/etc/ssl/certs/mycert.pem
-            - /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/privkey2.pem:/etc/ssl/private/mykey.pem
-        command:
-            - start
+              #keycloak:
+              #image: quay.io/keycloak/keycloak:23.0.6
+              #environment:
+              #KC_HOSTNAME: story.datanarrator.city/keycloak/
+              #KC_HEALTH_ENABLED: true
+              #KC_METRICS_ENABLED: true
+              #KC_PROXY_HEADERS: forwarded
+              #KC_HTTP_ENABLED: true
+              #
+              #KC_DB_URL: jdbc:postgresql://postgres/${POSTGRES_DB}
+              #KC_DB: postgres
+              #KC_DB_USERNAME: ${POSTGRES_USER}
+              #KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+              #KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+              #KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+              #
+              #KC_HTTPS_CERTIFICATE_FILE: /etc/ssl/certs/mycert.pem
+              #KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/ssl/private/mykey.pem
+              #ports:
+              #- 8444:8443
+              #- 9000:8080
+              #restart: always
+              #depends_on:
+              #- postgres
+              #networks:
+              #- story-network
+              #volumes:
+              #- /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/fullchain2.pem:/etc/ssl/certs/mycert.pem
+              #- /opt/psa/var/modules/letsencrypt/etc/archive/_plesk_domain/privkey2.pem:/etc/ssl/private/mykey.pem
+              #command:
+              #- start
 
 #    minio:
 #        image: minio/minio:RELEASE.2024-07-15T19-02-30Z
