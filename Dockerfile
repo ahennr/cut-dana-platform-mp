@@ -29,7 +29,7 @@ RUN npm run elie-buildPortal --prefix masterportal
 RUN ls -la /usr/app/masterportal/dist
 
 # Replicate custom-build.sh step: copy mastercode into stories directory
-RUN cd /usr/app/masterportal/dist && cp -r mastercode stories/
+RUN cd /usr/app/masterportal/dist && cp -r master stories/
 
 # Create container for running mobility-frontend
 FROM nginx
