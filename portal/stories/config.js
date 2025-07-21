@@ -1,4 +1,4 @@
-const backendUrl = process.env.BACKEND_URI || "http://localhost:8000";
+const backendUrl = (typeof process !== "undefined" && process.env && process.env.BACKEND_URI) || "http://localhost:8000";
 
 const Config = {
     addons: ["dataNarrator"],
