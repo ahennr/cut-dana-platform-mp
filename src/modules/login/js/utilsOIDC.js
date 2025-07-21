@@ -1,7 +1,7 @@
 import Cookie from "./utilsCookies";
 import {createHash} from "crypto";
 
-const backendUrl = process.env.BACKEND_URI || "http://localhost:8000";
+const backendUrl = process.env.BACKEND_URI || "https://staging-dana-backend.elie.de";
 
 /**
  * if false, local storage will ne used

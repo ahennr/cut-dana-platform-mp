@@ -2,7 +2,7 @@ import Cookie from "./utilsCookies";
 import OIDC from "./utilsOIDC";
 import AxiosUtils from "./utilsAxios";
 
-const backendUrl = process.env.BACKEND_URI || "http://localhost:8000";
+const backendUrl = process.env.BACKEND_URI || "https://staging-dana-backend.elie.de";
 
 /**
  * This function is used to intercept the masterportal load to

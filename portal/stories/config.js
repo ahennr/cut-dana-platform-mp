@@ -1,4 +1,4 @@
-const backendUrl = (typeof process !== "undefined" && process.env && process.env.BACKEND_URI) || "http://localhost:8000";
+const backendUrl = (typeof process !== "undefined" && process.env && process.env.BACKEND_URI) || "https://staging-dana-backend.elie.de";
 
 const Config = {
     addons: ["dataNarrator"],
