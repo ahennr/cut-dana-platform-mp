@@ -18,6 +18,9 @@ RUN apk add --update --no-cache \
 
 COPY . ./masterportal
 
+# Create .env file with build arguments
+RUN echo "BACKEND_URI=${BACKEND_URI}" > ./masterportal/.env
+
 RUN npm i --prefix masterportal/addons/dipasAddons/dataNarrator --legacy-peer-deps
 RUN npm i --prefix masterportal
 
