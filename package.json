@@ -70,6 +70,7 @@
     "i18next-http-backend": "^2.6.1",
     "i18next-vue": "^4.0.0",
     "jsts": "^2.11.3",
+    "motion-v": "^1.7.0",
     "mqtt": "^4.3.7",
     "object-hash": "^3.0.0",
     "pinia": "^3.0.1",
