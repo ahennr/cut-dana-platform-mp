@@ -5,6 +5,21 @@ const mutations = {
     ...generateSimpleMutations(stateMaps),
 
     /**
+     * Set both center and zoom in one go, and immediately move the map.
+     * @param {MapState} state
+     * @param {{ center: number[], zoom: number }} payload
+     */
+    setView (state, { center, zoom }) {
+        state.center = center;
+        state.zoom   = zoom;
+
+        const mapView = mapCollection.getMapView('2D');
+        mapView.setCenter(center);
+        mapView.setZoom(zoom);
+    },
+
+
+    /**
      * Adds the given feature to highlightedFeatures.
      * @param {Object} state the state.
      * @param {module:ol/Feature} feature - The given feature.
@@ -22,7 +37,7 @@ const mutations = {
      */
     addHighlightedFeatureStyle (state, style) {
         state.highlightedFeatureStyles.push(style);
-    }
+    },
 };
 
 export default mutations;
