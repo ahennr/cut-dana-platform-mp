@@ -3,18 +3,31 @@ import axios from "axios";
 /**
  * Adds interceptors to the different HTTP Get methods of javascript
  *
- * @param {string} token Bearer token to be added to the headers
- * @param {string} interceptorUrlRegex regex to match the urls that shall be eqipped with the bearer token
- * @return {void}
+ * @param {Object} params
+ * @param {() => Promise<string|undefined>} params.getFreshToken
+ *        An async function that returns the latest valid Bearer token, refreshing it if needed.
+ * @param {string|RegExp} [params.interceptorUrlRegex]
+ *        A regex to test which URLs should have the Authorization header attached.
+ *        Relative URLs always match.
+ * @returns {void}
  */
-function addInterceptor (token, interceptorUrlRegex) {
+function addInterceptor ({ getFreshToken, interceptorUrlRegex}) {
     axios.interceptors.request.use(
-        config => {
-            const configUrl = typeof config.url === "object" ? config.url.origin : config.url;
+        async (config) => {
+            const url = typeof config.url === "object" ? config.url.origin : config.url;
 
-            if (!configUrl?.startsWith("http") || (interceptorUrlRegex && configUrl?.match(interceptorUrlRegex))) {
-                config.headers.Authorization = `Bearer ${token}`;
+            const shouldAttach =
+                !url?.startsWith("http") ||
+                (interceptorUrlRegex && url?.match(interceptorUrlRegex));
+
+            if(shouldAttach) {
+                const token = await getFreshToken();
+                if (token) {
+                    config.headers = config.headers || {};
+                    config.headers.Authorization = `Bearer ${token}`;
+                }
             }
+
             return config;
         },
         error => {

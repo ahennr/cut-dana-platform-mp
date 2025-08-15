@@ -81,20 +81,16 @@ export function handleLoginParameters () {
  * @returns {void}
  */
 function addAuthenticationBearerInterceptors (config) {
-    const token = Cookie.get("token");
+    const getFreshToken = async () => {
+        const access = Cookie.get("token");
+        const refresh = Cookie.get("refresh_token");
 
-    if (token !== undefined) {
-        const account = OIDC.parseJwt(token),
-            expiry = account.exp ? account.exp * 1000 : Date.now() + 10000;
-
-        if (Date.now() > expiry) {
-            OIDC.eraseCookies();
-        }
-
-        AxiosUtils.addInterceptor(token, config?.interceptorUrlRegex);
+        await OIDC.renewTokenIfNecessary(access, refresh, config);
+        return Cookie.get("token");
     }
-}
 
+    AxiosUtils.addInterceptor({ getFreshToken, interceptorUrlRegex: config?.interceptorUrlRegex })
+}
 
 export default {
     handleLoginParameters
