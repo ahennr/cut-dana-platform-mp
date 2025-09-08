@@ -11,7 +11,7 @@ import axios from "axios";
  *        Relative URLs always match.
  * @returns {void}
  */
-function addInterceptor ({ getFreshToken, interceptorUrlRegex}) {
+function addInterceptor({getFreshToken, interceptorUrlRegex}) {
     axios.interceptors.request.use(
         async (config) => {
             const url = typeof config.url === "object" ? config.url.origin : config.url;
@@ -20,7 +20,7 @@ function addInterceptor ({ getFreshToken, interceptorUrlRegex}) {
                 !url?.startsWith("http") ||
                 (interceptorUrlRegex && url?.match(interceptorUrlRegex));
 
-            if(shouldAttach) {
+            if (shouldAttach) {
                 const token = await getFreshToken();
                 if (token) {
                     config.headers = config.headers || {};
@@ -35,32 +35,36 @@ function addInterceptor ({ getFreshToken, interceptorUrlRegex}) {
         }
     );
 
-    (function (open) {
-        XMLHttpRequest.prototype.open = function (method, url, ...rest) {
-            const opened = open.call(this, method, url, ...rest);
-
-            if (interceptorUrlRegex && this.responseURL?.match(interceptorUrlRegex)) {
-                this.setRequestHeader("Authorization", `Bearer ${token}`);
-            }
-            return opened;
-        };
-    })(XMLHttpRequest.prototype.open);
-
     const {fetch: originalFetch} = window;
 
     window.fetch = async (resource, options = null) => {
         let newOptions = options || {};
+        const url =
+            typeof resource === "string"
+                ? resource
+                : (resource && resource.url) || "";
 
-        if (interceptorUrlRegex && resource?.match(interceptorUrlRegex)) {
-            newOptions = {
-                ...newOptions,
-                credentials: "include"
-            };
+        const shouldAttach =
+            !url?.startsWith("http") ||
+            (interceptorUrlRegex && url?.match(interceptorUrlRegex));
+
+        if (shouldAttach) {
+            const token = await getFreshToken();
+            const headers =
+                newOptions.headers instanceof Headers
+                    ? Object.fromEntries(newOptions.headers.entries())
+                    : {...(newOptions.headers || {})};
+
+            if (token) headers.Authorization = `Bearer ${token}`;
+            newOptions = {...newOptions, headers};
+
+            if (interceptorUrlRegex && url?.match(interceptorUrlRegex)) {
+                newOptions.credentials = "include";
+            }
         }
 
         return originalFetch(resource, newOptions);
     };
-
 }
 
 export default {
