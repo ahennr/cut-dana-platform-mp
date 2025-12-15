@@ -24,13 +24,3 @@ jobs:
           run: ./custom-build.sh
           env:
               GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-        - name: Call Webhooks for Render Deployment
-          run: |
-              IFS=',' read -ra WEBHOOKS <<< "${WEBHOOK_URLS}"
-              for webhook in "${WEBHOOKS[@]}"; do
-              curl -X POST "$webhook"
-              done
-          env:
-              WEBHOOK_URLS: ${{ secrets.WEBHOOK_URL }}
-
